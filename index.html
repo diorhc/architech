@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ARCHITECH</title>
+    <meta name="description"
+        content="ARCHITECH is a leading modern architecture studio specializing in sustainable residential and commercial design, 3D visualization, and urban planning." />
+    <meta property="og:title" content="ARCHITECH" />
+    <meta property="og:description" content="Sustainable design and innovative architecture." />
+    <meta property="og:image"
+        content="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop" />
+    <meta property="og:type" content="website" />
+    <!-- Bootstrap CSS for grid system (optional since style.css handles most) but kept for container-fluid/row/col classes used -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Teko:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="grain"></div>
+    <div class="grain"></div>
+    <div class="container-fluid fixed-top header disable-selection">
+        <div class="header-content-wrap">
+            <h1 class="architech-title" data-text="ARCHITECH">ARCHITECH</h1>
+            <div class="header-btns-row">
+                <button id="enter-btn">PROJECTS</button>
+                <button id="services-btn">SERVICES</button>
+                <button id="contact-btn">CONTACT</button>
+                <div class="change-btn-wrapper">
+                    <div id="change-panel" class="change-panel">
+                        <div class="change-item" data-target="scene">
+                            <div class="color-trigger" style="background-color: #f02050"></div>
+                            <span>Background</span>
+                        </div>
+                        <div class="change-item" data-target="buildings">
+                            <div class="color-trigger" style="background-color: #000000"></div>
+                            <span>Buildings</span>
+                        </div>
+                        <div class="change-item" data-target="smoke">
+                            <div class="color-trigger" style="background-color: #ffff00"></div>
+                            <span>Particles</span>
+                        </div>
+                        <div class="change-item" data-target="grid">
+                            <div class="color-trigger" style="background-color: #ff0000"></div>
+                            <span>Grid</span>
+                        </div>
+                        <div class="change-item" data-target="cars">
+                            <div class="color-trigger" style="background-color: #ffff00"></div>
+                            <span>Cars</span>
+                        </div>
+                    </div>
+                    <div id="color-picker-container"></div>
+                    <button id="change-btn">CHANGE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="studios-wrap">
+        <button id="back-btn">← BACK</button>
+        <div class="container">
+            <div class="block_grid">
+                <!-- Item 1 -->
+                <div class="grid-item">
+                    <div class="grid-img" style="
+                background-image: url(&quot;https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop&quot;);
+              "></div>
+                    <div class="grid-content">
+                        <h3>Urban Design</h3>
+                        <p>Redefining cityscapes.</p>
+                    </div>
+                </div>
+                <!-- Item 2 -->
+                <div class="grid-item">
+                    <div class="grid-img" style="
+                background-image: url(&quot;https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop&quot;);
+              "></div>
+                    <div class="grid-content">
+                        <h3>Interior Lab</h3>
+                        <p>Spaces that breathe.</p>
+                    </div>
+                </div>
+                <!-- Item 3 -->
+                <div class="grid-item">
+                    <div class="grid-img" style="
+                background-image: url(&quot;https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2031&auto=format&fit=crop&quot;);
+              "></div>
+                    <div class="grid-content">
+                        <h3>Structural Eng</h3>
+                        <p>The backbone of innovation.</p>
+                    </div>
+                </div>
+                <!-- Item 4 -->
+                <div class="grid-item">
+                    <div class="grid-img" style="
+                background-image: url(&quot;https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?q=80&w=1997&auto=format&fit=crop&quot;);
+              "></div>
+                    <div class="grid-content">
+                        <h3>Sustainable Future</h3>
+                        <p>Eco-centric architecture.</p>
+                    </div>
+                </div>
+                <!-- Item 5 -->
+                <div class="grid-item">
+                    <div class="grid-img" style="
+                background-image: url(&quot;https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2071&auto=format&fit=crop&quot;);
+              "></div>
+                    <div class="grid-content">
+                        <h3>Digital Twin</h3>
+                        <p>Virtual reality integration.</p>
+                    </div>
+                </div>
+                <!-- Item 6 -->
+                <div class="grid-item">
+                    <div class="grid-img" style="
+                background-image: url(&quot;https://images.unsplash.com/photo-1554232456-8727aae0cfa4?q=80&w=1935&auto=format&fit=crop&quot;);
+              "></div>
+                    <div class="grid-content">
+                        <h3>Research & Dev</h3>
+                        <p>Pushing boundaries.</p>
+                    </div>
+                </div>
+                <!-- Item 7 -->
+                <div class="grid-item">
+                    <div class="grid-img" style="
+                background-image: url(&quot;https://images.unsplash.com/photo-1481026469463-66327c86e544?q=80&w=2108&auto=format&fit=crop&quot;);
+              "></div>
+                    <div class="grid-content">
+                        <h3>Global Network</h3>
+                        <p>Connecting the world.</p>
+                    </div>
+                </div>
+                <!-- Item 8 -->
+                <div class="grid-item">
+                    <div class="grid-img" style="
+                background-image: url(&quot;https://images.unsplash.com/photo-1497215842964-222b430dc0a8?q=80&w=2069&auto=format&fit=crop&quot;);
+              "></div>
+                    <div class="grid-content">
+                        <h3>Eco Systems</h3>
+                        <p>Green integration.</p>
+                    </div>
+                </div>
+                <!-- Item 9 -->
+                <div class="grid-item">
+                    <div class="grid-img" style="
+                background-image: url(&quot;https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?q=80&w=2070&auto=format&fit=crop&quot;);
+              "></div>
+                    <div class="grid-content">
+                        <h3>Future Tech</h3>
+                        <p>Next gen living.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-wrap">
+        <button id="contact-back-btn">← BACK</button>
+        <div class="contact-grid">
+            <div class="contact-left">
+                <h2 class="contact-slogan">LET'S<br />BUILD<br />THE<br />FUTURE</h2>
+            </div>
+            <div class="contact-right">
+                <div class="contact-info-block">
+                    <span class="info-label">Start a Project</span>
+                    <a href="mailto:refeg1411@gmail.com" class="info-link email-link">hello@architech.design</a>
+                </div>
+
+                <div class="contact-info-block">
+                    <span class="info-label">Studio</span>
+                    <p class="info-text">
+                        123 Innovation Blvd,<br />New York, NY 10001
+                    </p>
+                    <a href="tel:+1234567890" class="info-link phone-link">+1 (234) 567-890</a>
+                </div>
+
+                <div class="contact-form-mockup">
+                    <span class="info-label">Quick Inquiry</span>
+                    <div class="form-group">
+                        <input type="text" placeholder="Your Name" class="arch-input" />
+                    </div>
+                    <div class="form-group">
+                        <input type="email" placeholder="Email Address" class="arch-input" />
+                    </div>
+                    <button class="send-btn">SEND REQUEST</button>
+                </div>
+
+                <div class="social-row">
+                    <a href="https://web.telegram.org/k/#1095840075" class="social-link" target="_blank"
+                        rel="noopener">TG</a>
+                    <a href="https://wa.me/905550512812" class="social-link" target="_blank" rel="noopener">WA</a>
+                    <a href="https://tr.pinterest.com/rustameltezarov567/_saved/" class="social-link" target="_blank"
+                        rel="noopener">PT</a>
+                </div>
+            </div>
+        </div>
+        <div class="deco-line"></div>
+    </section>
+
+    <!-- Services & Pricing Section -->
+    <section class="services-wrap">
+        <button id="services-back-btn">← BACK</button>
+        <div class="services-container">
+            <h2 class="section-title">SERVICES & PRICING</h2>
+
+            <div class="services-grid">
+                <!-- Service Card 1 -->
+                <div class="service-card">
+                    <div class="card-header">
+                        <span class="service-number">01</span>
+                        <h3>Sketch Design</h3>
+                        <p class="service-sub">Эскизный проект</p>
+                    </div>
+                    <div class="card-body">
+                        <ul class="service-list">
+                            <li>Concept Development</li>
+                            <li>Section Drawings</li>
+                            <li>Planning Solutions</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer">
+                        <span class="price-fork">$5 - $10 <span class="unit">/ m²</span></span>
+                        <button class="select-plan-btn">SELECT</button>
+                    </div>
+                </div>
+
+                <!-- Service Card 2 (Premium/Featured) -->
+                <div class="service-card featured">
+                    <div class="card-header">
+                        <span class="service-number">02</span>
+                        <h3>Working Doc</h3>
+                        <p class="service-sub">Рабочая Документация (РД)</p>
+                    </div>
+                    <div class="card-body">
+                        <ul class="service-list">
+                            <li>Detailed Blueprints</li>
+                            <li>Engineering Plans</li>
+                            <li>Material Specifications</li>
+                            <li>Construction Nodes</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer">
+                        <span class="price-fork">$10 - $30 <span class="unit">/ m²</span></span>
+                        <button class="select-plan-btn">SELECT</button>
+                    </div>
+                </div>
+
+                <!-- Service Card 3 -->
+                <div class="service-card">
+                    <div class="card-header">
+                        <span class="service-number">03</span>
+                        <h3>Supervision</h3>
+                        <p class="service-sub">Авторский надзор</p>
+                    </div>
+                    <div class="card-body">
+                        <ul class="service-list">
+                            <li>3D Visualization</li>
+                            <li>Quality Control</li>
+                            <li>Design Compliance</li>
+                            <li>Contractor Coordination</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer">
+                        <span class="price-fork">$500 + <span class="unit">/ mo</span></span>
+                        <button class="select-plan-btn">SELECT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Three.js and plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/102/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.2/TweenMax.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
