@@ -2,6 +2,7 @@
 //----------------------------------------------------------------- BASIC parameters
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
 if (window.innerWidth > 800) {
   renderer.shadowMap.enabled = true;
@@ -17,6 +18,7 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 }
 
 var camera = new THREE.PerspectiveCamera(
@@ -35,6 +37,51 @@ var town = new THREE.Object3D();
 
 var createCarPos = true;
 var uSpeed = 0.001;
+
+function applyColorToMaterial(material, color) {
+  if (!material) return;
+  if (Array.isArray(material)) {
+    material.forEach((item) => {
+      if (item && item.color) item.color.copy(color);
+    });
+    return;
+  }
+  if (material.color) {
+    material.color.copy(color);
+  }
+}
+
+function updateBuildingsColor(color) {
+  if (!town || !town.children) return;
+  town.children.forEach((child) => {
+    if (child.isMesh && child.userData && child.userData.kind === "building") {
+      applyColorToMaterial(child.material, color);
+    }
+  });
+}
+
+function updateSmokeColor(color) {
+  if (!smoke || !smoke.children) return;
+  smoke.children.forEach((child) => {
+    if (child.isMesh) {
+      applyColorToMaterial(child.material, color);
+    }
+  });
+}
+
+function updateGridColor(color) {
+  if (!gridHelper) return;
+  applyColorToMaterial(gridHelper.material, color);
+}
+
+function updateCarsColor(color) {
+  if (!city || !city.children) return;
+  city.children.forEach((child) => {
+    if (child.isMesh && child.userData && child.userData.kind === "car") {
+      applyColorToMaterial(child.material, color);
+    }
+  });
+}
 
 //----------------------------------------------------------------- FOG background
 
@@ -55,10 +102,10 @@ var setTintNum = true;
 function setTintColor() {
   if (setTintNum) {
     setTintNum = false;
-    var setColor = 0x000000;
+    var setColor = 0x0d0d0d;
   } else {
     setTintNum = true;
-    var setColor = 0x000000;
+    var setColor = 0x1a1a1a;
   }
   return setColor;
 }
@@ -68,7 +115,7 @@ function setTintColor() {
 function init() {
   var segments = 2;
   for (var i = 1; i < 100; i++) {
-    var geometry = new THREE.BoxGeometry(1, 0, 0, segments, segments, segments); // Updated to BoxGeometry
+    var geometry = new THREE.BoxGeometry(1, 1, 1, segments, segments, segments);
     var material = new THREE.MeshStandardMaterial({
       color: setTintColor(),
       wireframe: false,
@@ -87,6 +134,9 @@ function init() {
     var wire = new THREE.Mesh(geometry, wmaterial);
     var floor = new THREE.Mesh(geometry, material);
     var wfloor = new THREE.Mesh(geometry, wmaterial);
+
+    cube.userData.kind = "building";
+    floor.userData.kind = "floor";
 
     cube.add(wfloor);
     cube.castShadow = true;
@@ -238,7 +288,8 @@ var createCars = function (cScale = 2, cPos = 20, cColor = 0xffff00) {
   }
   cElem.receiveShadow = true;
   cElem.castShadow = true;
-  cElem.position.y = Math.abs(mathRandom(5));
+  cElem.position.y = 0.05; // Ground level
+  cElem.userData.kind = "car";
   city.add(cElem);
 };
 
@@ -320,6 +371,34 @@ class KineticLoader {
 
 // Start animation
 new KineticLoader(".architech-title");
+
+//----------------------------------------------------------------- CONTACT FORM
+function handleFormSubmit(e) {
+  e.preventDefault();
+  const name = document.getElementById("form-name").value.trim();
+  const email = document.getElementById("form-email").value.trim();
+  const message = document.getElementById("form-message").value.trim();
+  const status = document.getElementById("form-status");
+  const btn = document.getElementById("send-btn");
+
+  if (!name || !email || !message) return;
+
+  // Simulate send (no backend - show success state)
+  btn.disabled = true;
+  btn.textContent = "SENDING...";
+  status.textContent = "";
+
+  setTimeout(() => {
+    btn.textContent = "SEND REQUEST";
+    btn.disabled = false;
+    status.textContent = "✓ Message received! We'll get back to you shortly.";
+    status.style.color = "#4caf50";
+    document.getElementById("contact-form").reset();
+    setTimeout(() => {
+      status.textContent = "";
+    }, 5000);
+  }, 1200);
+}
 
 //----------------------------------------------------------------- PAGE TRANSITION
 //----------------------------------------------------------------- PAGE TRANSITION
@@ -533,36 +612,16 @@ function applySavedColors() {
 
         switch (target) {
           case "buildings":
-            if (town && town.children) {
-              town.children.forEach((child) => {
-                if (child.isMesh && child.material && child.scale.y > 0.1) {
-                  child.material.color = threeColor;
-                }
-              });
-            }
+            updateBuildingsColor(threeColor);
             break;
           case "smoke":
-            if (smoke && smoke.children) {
-              smoke.children.forEach((child) => {
-                if (child.isMesh && child.material) {
-                  child.material.color = threeColor;
-                }
-              });
-            }
+            updateSmokeColor(threeColor);
             break;
           case "grid":
-            if (gridHelper && gridHelper.material) {
-              gridHelper.material.color = threeColor;
-            }
+            updateGridColor(threeColor);
             break;
           case "cars":
-            if (city && city.children) {
-              city.children.forEach((child) => {
-                if (child.isMesh && child.material && child.position.y > 0.1) {
-                  child.material.color = threeColor;
-                }
-              });
-            }
+            updateCarsColor(threeColor);
             break;
           case "scene":
             if (scene) {
@@ -587,6 +646,19 @@ setTimeout(function () {
   const changeBtn = document.getElementById("change-btn");
   const changePanel = document.getElementById("change-panel");
   const pickerContainer = document.getElementById("color-picker-container");
+
+  if (!changeBtn || !changePanel || !pickerContainer) {
+    return;
+  }
+
+  if (!window.iro || typeof window.iro.ColorPicker !== "function") {
+    console.warn("iro.js failed to load. Change panel is unavailable.");
+    changeBtn.disabled = true;
+    changeBtn.style.opacity = "0.5";
+    changeBtn.style.cursor = "not-allowed";
+    return;
+  }
+
   let activeTarget = null;
   let activeTrigger = null;
 
@@ -598,7 +670,7 @@ setTimeout(function () {
     borderColor: "#fff",
   });
 
-  if (changeBtn && changePanel) {
+  {
     // Helper to center color picker
     function centerPicker() {
       if (
@@ -642,7 +714,8 @@ setTimeout(function () {
         activeTrigger = item.querySelector(".color-trigger");
 
         // Set picker color to current trigger color
-        const currentColor = activeTrigger.style.backgroundColor;
+        const currentColor =
+          activeTrigger.style.backgroundColor || "rgb(255, 255, 255)";
         colorPicker.color.set(currentColor);
 
         // Show picker container
@@ -677,36 +750,16 @@ setTimeout(function () {
       // Update 3D Scene with null checks
       switch (activeTarget) {
         case "buildings":
-          if (town && town.children) {
-            town.children.forEach((child) => {
-              if (child.isMesh && child.material && child.scale.y > 0.1) {
-                child.material.color = threeColor;
-              }
-            });
-          }
+          updateBuildingsColor(threeColor);
           break;
         case "smoke":
-          if (smoke && smoke.children) {
-            smoke.children.forEach((child) => {
-              if (child.isMesh && child.material) {
-                child.material.color = threeColor;
-              }
-            });
-          }
+          updateSmokeColor(threeColor);
           break;
         case "grid":
-          if (gridHelper && gridHelper.material) {
-            gridHelper.material.color = threeColor;
-          }
+          updateGridColor(threeColor);
           break;
         case "cars":
-          if (city && city.children) {
-            city.children.forEach((child) => {
-              if (child.isMesh && child.material && child.position.y > 0.1) {
-                child.material.color = threeColor;
-              }
-            });
-          }
+          updateCarsColor(threeColor);
           break;
         case "scene":
           if (scene) {

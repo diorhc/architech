@@ -1,5 +1,12 @@
 html {
   height: 100%;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
 }
 
 body {
@@ -27,7 +34,7 @@ canvas {
 }
 
 .header {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -91,7 +98,7 @@ canvas {
 
 /* STUDIOS GRID SECTION */
 .studios-wrap {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -115,6 +122,13 @@ canvas {
   pointer-events: auto !important;
   transform: translateY(0);
   z-index: 200;
+}
+
+/* Projects container */
+.projects-container {
+  width: 90%;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 /* BACK BUTTON */
@@ -277,7 +291,6 @@ canvas {
 }
 
 @keyframes grain {
-
   0%,
   100% {
     transform: translate(0, 0);
@@ -406,7 +419,7 @@ canvas {
 }
 
 /* Expansion of change-btn when panel is visible */
-.change-panel.visible~#change-btn {
+.change-panel.visible ~ #change-btn {
   width: 200px !important;
 }
 
@@ -619,6 +632,36 @@ canvas {
   color: rgba(255, 255, 255, 0.6);
   line-height: 1.5;
   margin: 0 0 15px 0;
+}
+
+.arch-textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.4;
+}
+
+.arch-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.form-status {
+  font-family: "Teko", sans-serif;
+  font-size: 18px;
+  margin-top: 12px;
+  letter-spacing: 1px;
+  min-height: 24px;
+}
+
+/* Form */
+#contact-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.send-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Form Mockup */
