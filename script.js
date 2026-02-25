@@ -100,14 +100,8 @@ function mathRandom(num = 8) {
 //----------------------------------------------------------------- CHANGE building colors
 var setTintNum = true;
 function setTintColor() {
-  if (setTintNum) {
-    setTintNum = false;
-    var setColor = 0x0d0d0d;
-  } else {
-    setTintNum = true;
-    var setColor = 0x1a1a1a;
-  }
-  return setColor;
+  setTintNum = !setTintNum;
+  return setTintNum ? 0x0d0d0d : 0x1a1a1a;
 }
 
 //----------------------------------------------------------------- CREATE City
@@ -131,7 +125,6 @@ function init() {
     });
 
     var cube = new THREE.Mesh(geometry, material);
-    var wire = new THREE.Mesh(geometry, wmaterial);
     var floor = new THREE.Mesh(geometry, material);
     var wfloor = new THREE.Mesh(geometry, wmaterial);
 

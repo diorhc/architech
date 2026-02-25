@@ -997,6 +997,44 @@ canvas {
   border-color: #f02050;
 }
 
+@media (max-width: 768px) {
+  .header-btns-row {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 15px;
+  }
+
+  #enter-btn,
+  #services-btn,
+  #contact-btn,
+  #change-btn {
+    font-size: 18px;
+    padding: 8px 20px;
+  }
+
+  .block_grid {
+    grid-template-columns: 1fr;
+    perspective: none;
+  }
+
+  .grid-item:nth-child(3n + 1),
+  .grid-item:nth-child(3n + 2),
+  .grid-item:nth-child(3n + 3) {
+    transform: none;
+    transform-origin: center;
+  }
+
+  .change-panel {
+    right: auto !important;
+    left: 0 !important;
+  }
+
+  #color-picker-container {
+    left: 0 !important;
+    top: calc(100% + 10px) !important;
+  }
+}
+
 @media (max-width: 1000px) {
   .services-grid {
     grid-template-columns: 1fr;
