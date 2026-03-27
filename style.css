@@ -30,7 +30,6 @@ canvas {
   left: 0;
   z-index: 1 !important;
   pointer-events: none !important;
-  cursor: crosshair;
 }
 
 .header {
@@ -224,7 +223,9 @@ canvas {
   background-size: cover;
   background-position: center;
   filter: grayscale(100%) brightness(0.5) contrast(1.2);
-  transition: all 0.6s ease;
+  transition:
+    filter 0.6s ease,
+    transform 0.6s ease;
 }
 
 .grid-content {
@@ -274,63 +275,6 @@ canvas {
   display: flex;
   white-space: pre;
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-}
-
-/* Cinematic Grain Effect */
-.grain {
-  position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-  opacity: 0.05;
-  pointer-events: none !important;
-  z-index: 100;
-  animation: grain 8s steps(10) infinite;
-}
-
-@keyframes grain {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-
-  10% {
-    transform: translate(-5%, -10%);
-  }
-
-  20% {
-    transform: translate(-15%, 5%);
-  }
-
-  30% {
-    transform: translate(7%, -25%);
-  }
-
-  40% {
-    transform: translate(-5%, 25%);
-  }
-
-  50% {
-    transform: translate(-15%, 10%);
-  }
-
-  60% {
-    transform: translate(15%, 0%);
-  }
-
-  70% {
-    transform: translate(0, 15%);
-  }
-
-  80% {
-    transform: translate(3%, 35%);
-  }
-
-  90% {
-    transform: translate(-10%, 10%);
-  }
 }
 
 .disable-selection {
@@ -412,6 +356,7 @@ canvas {
   opacity: 1;
   visibility: visible;
   pointer-events: auto !important;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-color: rgba(255, 255, 255, 0.4) !important;
   transform: translateY(0);
@@ -518,6 +463,7 @@ canvas {
   width: 100%;
   height: 100vh;
   background-color: rgba(5, 5, 5, 0.9);
+  -webkit-backdrop-filter: blur(15px);
   backdrop-filter: blur(15px);
   z-index: 200;
   opacity: 0;
@@ -692,6 +638,8 @@ canvas {
 
 .arch-input:focus {
   border-bottom-color: #f02050;
+  outline: 2px solid rgba(240, 32, 80, 0.3);
+  outline-offset: 4px;
 }
 
 .arch-input::placeholder {
@@ -816,6 +764,7 @@ canvas {
   width: 100%;
   height: 100vh;
   background-color: rgba(5, 5, 5, 0.95);
+  -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   z-index: 200;
   opacity: 0;
@@ -875,7 +824,11 @@ canvas {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: all 0.4s ease;
+  transition:
+    background 0.4s ease,
+    border-color 0.4s ease,
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
   position: relative;
   overflow: hidden;
   opacity: 0;
@@ -1043,5 +996,126 @@ canvas {
   .services-wrap {
     align-items: flex-start;
     padding-top: 100px;
+  }
+}
+
+/* ================================================================
+   WebGL FALLBACK — Animated CSS background when 3D is unavailable
+   ================================================================ */
+.webgl-fallback-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: linear-gradient(135deg, #0a0a0a 0%, #f02050 50%, #0a0a0a 100%);
+  background-size: 400% 400%;
+  animation: fallbackShift 12s ease infinite;
+}
+
+.webgl-fallback-bg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background:
+    radial-gradient(
+      ellipse at 20% 50%,
+      rgba(240, 32, 80, 0.15) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse at 80% 20%,
+      rgba(255, 255, 0, 0.08) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 50% 80%,
+      rgba(240, 32, 80, 0.1) 0%,
+      transparent 50%
+    );
+  animation: fallbackPulse 8s ease-in-out infinite alternate;
+}
+
+.webgl-fallback-bg::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.015) 2px,
+    rgba(255, 255, 255, 0.015) 4px
+  );
+  pointer-events: none;
+}
+
+@keyframes fallbackShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes fallbackPulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* When no-webgl class is on body, ensure site still looks good */
+body.no-webgl canvas {
+  display: none !important;
+}
+
+/* ================================================================
+   Focus Styles — Keyboard Accessibility
+   ================================================================ */
+#enter-btn:focus-visible,
+#services-btn:focus-visible,
+#contact-btn:focus-visible,
+#change-btn:focus-visible,
+#back-btn:focus-visible,
+#contact-back-btn:focus-visible,
+#services-back-btn:focus-visible,
+.select-plan-btn:focus-visible,
+.send-btn:focus-visible {
+  outline: 2px solid rgba(240, 32, 80, 0.8);
+  outline-offset: 4px;
+}
+
+.social-link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 4px;
+}
+
+/* ================================================================
+   Reduced Motion — Accessibility
+   ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
