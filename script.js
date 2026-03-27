@@ -259,7 +259,8 @@ var createCars = function (cScale = 2, cPos = 20, cColor = 0xffff00) {
     cElem.position.x = -cPos;
     cElem.position.z = mathRandom(cAmp);
 
-    TweenMax.to(cElem.position, 3, {
+    gsap.to(cElem.position, {
+      duration: 3,
       x: cPos,
       repeat: -1,
       yoyo: true,
@@ -271,12 +272,13 @@ var createCars = function (cScale = 2, cPos = 20, cColor = 0xffff00) {
     cElem.position.z = -cPos;
     cElem.rotation.y = (90 * Math.PI) / 180;
 
-    TweenMax.to(cElem.position, 5, {
+    gsap.to(cElem.position, {
+      duration: 5,
       z: cPos,
       repeat: -1,
       yoyo: true,
       delay: mathRandom(3),
-      ease: Power1.easeInOut,
+      ease: "power1.inOut",
     });
   }
   cElem.receiveShadow = true;
@@ -414,10 +416,11 @@ if (header) {
       header.classList.add("intro-hidden");
 
       // Warp In
-      TweenMax.to(camera.position, 1.5, {
+      gsap.to(camera.position, {
+        duration: 1.5,
         z: 2,
         y: 1,
-        ease: Expo.easeInOut,
+        ease: "expo.inOut",
       });
 
       setTimeout(() => {
@@ -433,38 +436,38 @@ if (header) {
       contactWrap.classList.add("visible");
 
       // Animate Slogan (Staggered or simple fade up)
-      TweenMax.to(".contact-slogan", 1, {
+      gsap.to(".contact-slogan", {
+        duration: 1,
         y: 0,
         opacity: 1,
-        ease: Power3.easeOut,
+        ease: "power3.out",
         delay: 0.5,
       });
 
       // Animate Info Blocks
-      TweenMax.staggerTo(
-        ".contact-info-block",
-        0.8,
-        {
-          y: 0,
-          opacity: 1,
-          ease: Power3.easeOut,
-          delay: 0.8,
-        },
-        0.2,
-      );
-
-      // Animate Form
-      TweenMax.to(".contact-form-mockup", 0.8, {
+      gsap.to(".contact-info-block", {
+        duration: 0.8,
         y: 0,
         opacity: 1,
-        ease: Power3.easeOut,
+        ease: "power3.out",
+        delay: 0.8,
+        stagger: 0.2,
+      });
+
+      // Animate Form
+      gsap.to(".contact-form-mockup", {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "power3.out",
         delay: 1.2,
       });
 
       // Animate Social Layer
-      TweenMax.to(".social-row", 0.8, {
+      gsap.to(".social-row", {
+        duration: 0.8,
         opacity: 1,
-        ease: Power3.easeOut,
+        ease: "power3.out",
         delay: 1.4,
       });
     });
@@ -482,11 +485,12 @@ if (header) {
 
       // CAMERA ANIMATION: Blueprint View (Top-Down)
       // Move camera high up and look down
-      TweenMax.to(camera.position, 1.5, {
+      gsap.to(camera.position, {
+        duration: 1.5,
         x: 0,
         y: 20,
         z: 0.1, // Small Z to avoid gimbal lock/flipping issues with lookAt(0,0,0)
-        ease: Power3.easeInOut,
+        ease: "power3.inOut",
         onUpdate: function () {
           camera.lookAt(scene.position);
         },
@@ -495,25 +499,23 @@ if (header) {
       // Or just keep as is. Top down looks cool.
 
       // Animate Title
-      TweenMax.to(".section-title", 1, {
+      gsap.to(".section-title", {
+        duration: 1,
         y: 0,
         opacity: 1,
-        ease: Power3.easeOut,
+        ease: "power3.out",
         delay: 0.8,
       });
 
       // Animate Service Cards
-      TweenMax.staggerTo(
-        ".service-card",
-        0.8,
-        {
-          y: 0,
-          opacity: 1,
-          ease: Power3.easeOut,
-          delay: 1.0,
-        },
-        0.2,
-      );
+      gsap.to(".service-card", {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "power3.out",
+        delay: 1.0,
+        stagger: 0.2,
+      });
     });
   }
 
@@ -525,28 +527,29 @@ if (header) {
     // Reset Contact
     if (contactWrap) {
       contactWrap.classList.remove("visible");
-      TweenMax.set(".contact-slogan", { y: 50, opacity: 0 });
-      TweenMax.set(".contact-info-block", { y: 20, opacity: 0 });
-      TweenMax.set(".contact-form-mockup", { y: 20, opacity: 0 });
-      TweenMax.set(".social-row", { opacity: 0 });
+      gsap.set(".contact-slogan", { y: 50, opacity: 0 });
+      gsap.set(".contact-info-block", { y: 20, opacity: 0 });
+      gsap.set(".contact-form-mockup", { y: 20, opacity: 0 });
+      gsap.set(".social-row", { opacity: 0 });
     }
 
     // Reset Services
     if (servicesWrap) {
       servicesWrap.classList.remove("visible");
-      TweenMax.set(".section-title", { y: 30, opacity: 0 });
-      TweenMax.set(".service-card", { y: 50, opacity: 0 });
+      gsap.set(".section-title", { y: 30, opacity: 0 });
+      gsap.set(".service-card", { y: 50, opacity: 0 });
     }
 
     // 2. Reset Camera (Warp Back)
     // We need to kill any onUpdate loop that might be forcing lookAt
-    TweenMax.killTweensOf(camera.position); // Stop the lookAt update
+    gsap.killTweensOf(camera.position); // Stop the lookAt update
 
-    TweenMax.to(camera.position, 1.5, {
+    gsap.to(camera.position, {
+      duration: 1.5,
       x: defaultCamPos.x,
       y: defaultCamPos.y,
       z: defaultCamPos.z,
-      ease: Expo.easeInOut,
+      ease: "expo.inOut",
       onUpdate: function () {
         // Optional: Smoothly transition lookAt back to center if needed,
         // but default default lookAt behavior is controlled in render loop
@@ -555,11 +558,12 @@ if (header) {
         // So we just need to move the position.
       },
     });
-    TweenMax.to(camera.rotation, 1.5, {
+    gsap.to(camera.rotation, {
+      duration: 1.5,
       x: defaultCamRot.x,
       y: defaultCamRot.y,
       z: defaultCamRot.z,
-      ease: Expo.easeInOut,
+      ease: "expo.inOut",
     });
 
     // 3. Show Header

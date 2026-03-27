@@ -388,9 +388,27 @@
     </section>
 
     <!-- Three.js and plugins -->
-    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5.5.2/dist/iro.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script>
+      // GSAP 3 backward compatibility for TweenMax syntax
+      window.TweenMax = gsap;
+      window.TweenLite = gsap;
+      window.Power1 = window.Power2 = window.Power3 = window.Power4 = gsap;
+      window.Expo = {
+        easeInOut: "expo.inOut",
+        easeIn: "expo.in",
+        easeOut: "expo.out",
+      };
+
+      // Verify Three.js loaded
+      if (typeof THREE === "undefined") {
+        console.error("Three.js failed to load");
+        document.body.innerHTML =
+          '<div style="color:white;text-align:center;padding:50px;">Failed to load 3D engine. Please refresh the page.</div>';
+      }
+    </script>
     <script src="script.js"></script>
   </body>
 </html>
