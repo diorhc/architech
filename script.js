@@ -1,20 +1,83 @@
 // Three JS Template
 //----------------------------------------------------------------- BASIC parameters
-var renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+var renderer;
+var webglFailed = false;
 
-if (window.innerWidth > 800) {
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.shadowMap.needsUpdate = true;
+// Robust WebGL initialization with multiple fallback strategies
+(function initWebGL() {
+  // Strategy 1: Let Three.js create everything with safe options
+  var strategies = [
+    { antialias: true, failIfMajorPerformanceCaveat: false, alpha: false },
+    {
+      antialias: true,
+      failIfMajorPerformanceCaveat: false,
+      alpha: false,
+      powerPreference: "default",
+    },
+    { antialias: false, failIfMajorPerformanceCaveat: false, alpha: false },
+    // Strategy with manual canvas
+    "manual",
+  ];
+
+  for (var i = 0; i < strategies.length; i++) {
+    try {
+      if (strategies[i] === "manual") {
+        // Manual canvas + context creation
+        var canvas = document.createElement("canvas");
+        var gl =
+          canvas.getContext("webgl2") ||
+          canvas.getContext("webgl") ||
+          canvas.getContext("experimental-webgl");
+        if (!gl) continue;
+        renderer = new THREE.WebGLRenderer({
+          canvas: canvas,
+          context: gl,
+          antialias: false,
+        });
+      } else {
+        renderer = new THREE.WebGLRenderer(strategies[i]);
+      }
+      // Test renderer actually works
+      renderer.setSize(1, 1);
+      console.log("WebGL initialized with strategy " + (i + 1));
+      break;
+    } catch (e) {
+      console.warn("WebGL strategy " + (i + 1) + " failed:", e.message);
+      renderer = null;
+    }
+  }
+
+  if (!renderer) {
+    webglFailed = true;
+    console.warn("All WebGL strategies failed. Activating CSS fallback.");
+    // Activate CSS animated background fallback
+    document.body.classList.add("no-webgl");
+    // Create animated background
+    var bgFallback = document.createElement("div");
+    bgFallback.className = "webgl-fallback-bg";
+    document.body.insertBefore(bgFallback, document.body.firstChild);
+  }
+})();
+
+if (renderer) {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 }
-//---
 
-document.body.appendChild(renderer.domElement);
+if (renderer) {
+  if (window.innerWidth > 800) {
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.needsUpdate = true;
+  }
+  //---
+
+  document.body.appendChild(renderer.domElement);
+}
 
 window.addEventListener("resize", onWindowResize, false);
 function onWindowResize() {
+  if (!renderer) return;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -108,25 +171,34 @@ function setTintColor() {
 
 function init() {
   var segments = 2;
+  // Reuse geometry and wireframe material across all buildings
+  var sharedGeometry = new THREE.BoxGeometry(
+    1,
+    1,
+    1,
+    segments,
+    segments,
+    segments,
+  );
+  var wmaterial = new THREE.MeshLambertMaterial({
+    color: 0xffffff,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.03,
+    side: THREE.DoubleSide,
+  });
+
   for (var i = 1; i < 100; i++) {
-    var geometry = new THREE.BoxGeometry(1, 1, 1, segments, segments, segments);
     var material = new THREE.MeshStandardMaterial({
       color: setTintColor(),
       wireframe: false,
       flatShading: true,
       side: THREE.DoubleSide,
     });
-    var wmaterial = new THREE.MeshLambertMaterial({
-      color: 0xffffff,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.03,
-      side: THREE.DoubleSide,
-    });
 
-    var cube = new THREE.Mesh(geometry, material);
-    var floor = new THREE.Mesh(geometry, material);
-    var wfloor = new THREE.Mesh(geometry, wmaterial);
+    var cube = new THREE.Mesh(sharedGeometry, material);
+    var floor = new THREE.Mesh(sharedGeometry, material);
+    var wfloor = new THREE.Mesh(sharedGeometry, wmaterial);
 
     cube.userData.kind = "building";
     floor.userData.kind = "floor";
@@ -194,27 +266,24 @@ var mouse = new THREE.Vector2(),
   INTERSECTED;
 
 function onMouseMove(event) {
-  event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
 function onDocumentTouchStart(event) {
   if (event.touches.length == 1) {
-    event.preventDefault();
     mouse.x = event.touches[0].pageX - window.innerWidth / 2;
     mouse.y = event.touches[0].pageY - window.innerHeight / 2;
   }
 }
 function onDocumentTouchMove(event) {
   if (event.touches.length == 1) {
-    event.preventDefault();
     mouse.x = event.touches[0].pageX - window.innerWidth / 2;
     mouse.y = event.touches[0].pageY - window.innerHeight / 2;
   }
 }
 window.addEventListener("mousemove", onMouseMove, false);
-window.addEventListener("touchstart", onDocumentTouchStart, false);
-window.addEventListener("touchmove", onDocumentTouchMove, false);
+window.addEventListener("touchstart", onDocumentTouchStart, { passive: true });
+window.addEventListener("touchmove", onDocumentTouchMove, { passive: true });
 
 //----------------------------------------------------------------- Lights
 var ambientLight = new THREE.AmbientLight(0xffffff, 4);
@@ -259,8 +328,7 @@ var createCars = function (cScale = 2, cPos = 20, cColor = 0xffff00) {
     cElem.position.x = -cPos;
     cElem.position.z = mathRandom(cAmp);
 
-    gsap.to(cElem.position, {
-      duration: 3,
+    TweenMax.to(cElem.position, 3, {
       x: cPos,
       repeat: -1,
       yoyo: true,
@@ -272,13 +340,12 @@ var createCars = function (cScale = 2, cPos = 20, cColor = 0xffff00) {
     cElem.position.z = -cPos;
     cElem.rotation.y = (90 * Math.PI) / 180;
 
-    gsap.to(cElem.position, {
-      duration: 5,
+    TweenMax.to(cElem.position, 5, {
       z: cPos,
       repeat: -1,
       yoyo: true,
       delay: mathRandom(3),
-      ease: "power1.inOut",
+      ease: Power1.easeInOut,
     });
   }
   cElem.receiveShadow = true;
@@ -297,6 +364,7 @@ var generateLines = function () {
 //----------------------------------------------------------------- ANIMATE
 
 var animate = function () {
+  if (!renderer) return; // No WebGL - skip animation
   requestAnimationFrame(animate);
 
   city.rotation.y -= (mouse.x * 8 - camera.rotation.y) * uSpeed;
@@ -416,11 +484,10 @@ if (header) {
       header.classList.add("intro-hidden");
 
       // Warp In
-      gsap.to(camera.position, {
-        duration: 1.5,
+      TweenMax.to(camera.position, 1.5, {
         z: 2,
         y: 1,
-        ease: "expo.inOut",
+        ease: Expo.easeInOut,
       });
 
       setTimeout(() => {
@@ -436,38 +503,38 @@ if (header) {
       contactWrap.classList.add("visible");
 
       // Animate Slogan (Staggered or simple fade up)
-      gsap.to(".contact-slogan", {
-        duration: 1,
+      TweenMax.to(".contact-slogan", 1, {
         y: 0,
         opacity: 1,
-        ease: "power3.out",
+        ease: Power3.easeOut,
         delay: 0.5,
       });
 
       // Animate Info Blocks
-      gsap.to(".contact-info-block", {
-        duration: 0.8,
-        y: 0,
-        opacity: 1,
-        ease: "power3.out",
-        delay: 0.8,
-        stagger: 0.2,
-      });
+      TweenMax.staggerTo(
+        ".contact-info-block",
+        0.8,
+        {
+          y: 0,
+          opacity: 1,
+          ease: Power3.easeOut,
+          delay: 0.8,
+        },
+        0.2,
+      );
 
       // Animate Form
-      gsap.to(".contact-form-mockup", {
-        duration: 0.8,
+      TweenMax.to(".contact-form-mockup", 0.8, {
         y: 0,
         opacity: 1,
-        ease: "power3.out",
+        ease: Power3.easeOut,
         delay: 1.2,
       });
 
       // Animate Social Layer
-      gsap.to(".social-row", {
-        duration: 0.8,
+      TweenMax.to(".social-row", 0.8, {
         opacity: 1,
-        ease: "power3.out",
+        ease: Power3.easeOut,
         delay: 1.4,
       });
     });
@@ -485,12 +552,11 @@ if (header) {
 
       // CAMERA ANIMATION: Blueprint View (Top-Down)
       // Move camera high up and look down
-      gsap.to(camera.position, {
-        duration: 1.5,
+      TweenMax.to(camera.position, 1.5, {
         x: 0,
         y: 20,
         z: 0.1, // Small Z to avoid gimbal lock/flipping issues with lookAt(0,0,0)
-        ease: "power3.inOut",
+        ease: Power3.easeInOut,
         onUpdate: function () {
           camera.lookAt(scene.position);
         },
@@ -499,23 +565,25 @@ if (header) {
       // Or just keep as is. Top down looks cool.
 
       // Animate Title
-      gsap.to(".section-title", {
-        duration: 1,
+      TweenMax.to(".section-title", 1, {
         y: 0,
         opacity: 1,
-        ease: "power3.out",
+        ease: Power3.easeOut,
         delay: 0.8,
       });
 
       // Animate Service Cards
-      gsap.to(".service-card", {
-        duration: 0.8,
-        y: 0,
-        opacity: 1,
-        ease: "power3.out",
-        delay: 1.0,
-        stagger: 0.2,
-      });
+      TweenMax.staggerTo(
+        ".service-card",
+        0.8,
+        {
+          y: 0,
+          opacity: 1,
+          ease: Power3.easeOut,
+          delay: 1.0,
+        },
+        0.2,
+      );
     });
   }
 
@@ -527,29 +595,28 @@ if (header) {
     // Reset Contact
     if (contactWrap) {
       contactWrap.classList.remove("visible");
-      gsap.set(".contact-slogan", { y: 50, opacity: 0 });
-      gsap.set(".contact-info-block", { y: 20, opacity: 0 });
-      gsap.set(".contact-form-mockup", { y: 20, opacity: 0 });
-      gsap.set(".social-row", { opacity: 0 });
+      TweenMax.set(".contact-slogan", { y: 50, opacity: 0 });
+      TweenMax.set(".contact-info-block", { y: 20, opacity: 0 });
+      TweenMax.set(".contact-form-mockup", { y: 20, opacity: 0 });
+      TweenMax.set(".social-row", { opacity: 0 });
     }
 
     // Reset Services
     if (servicesWrap) {
       servicesWrap.classList.remove("visible");
-      gsap.set(".section-title", { y: 30, opacity: 0 });
-      gsap.set(".service-card", { y: 50, opacity: 0 });
+      TweenMax.set(".section-title", { y: 30, opacity: 0 });
+      TweenMax.set(".service-card", { y: 50, opacity: 0 });
     }
 
     // 2. Reset Camera (Warp Back)
     // We need to kill any onUpdate loop that might be forcing lookAt
-    gsap.killTweensOf(camera.position); // Stop the lookAt update
+    TweenMax.killTweensOf(camera.position); // Stop the lookAt update
 
-    gsap.to(camera.position, {
-      duration: 1.5,
+    TweenMax.to(camera.position, 1.5, {
       x: defaultCamPos.x,
       y: defaultCamPos.y,
       z: defaultCamPos.z,
-      ease: "expo.inOut",
+      ease: Expo.easeInOut,
       onUpdate: function () {
         // Optional: Smoothly transition lookAt back to center if needed,
         // but default default lookAt behavior is controlled in render loop
@@ -558,12 +625,11 @@ if (header) {
         // So we just need to move the position.
       },
     });
-    gsap.to(camera.rotation, {
-      duration: 1.5,
+    TweenMax.to(camera.rotation, 1.5, {
       x: defaultCamRot.x,
       y: defaultCamRot.y,
       z: defaultCamRot.z,
-      ease: "expo.inOut",
+      ease: Expo.easeInOut,
     });
 
     // 3. Show Header
@@ -585,9 +651,11 @@ if (header) {
 }
 
 //----------------------------------------------------------------- START functions
-generateLines();
-init();
-animate();
+if (!webglFailed) {
+  generateLines();
+  init();
+  animate();
+}
 
 //----------------------------------------------------------------- APPLY SAVED COLORS
 function applySavedColors() {
